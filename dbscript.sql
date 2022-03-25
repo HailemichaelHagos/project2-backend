@@ -60,5 +60,26 @@ CREATE TABLE merged_reimbursment(reimbursement_id INT GENERATED ALWAYS AS IDENTI
 								
 INSERT INTO merged_reimbursment(requesting_employee_id, reimbursement_amount, request_approved)
 	VALUES('1','10000.00', 'NO');
+	
+	
+CREATE TABLE reimbursement_proof(reimbursement_id INT GENERATED ALWAYS AS IDENTITY,
+								requesting_employee_id INT,
+								tphoto bytea,
+								PRIMARY KEY(reimbursement_id ),
+   								CONSTRAINT fk_employee
+   								FOREIGN KEY(requesting_employee_id) 
+   								REFERENCES employee(employee_id));
+								
+INSERT INTO reimbursement_proof(requesting_employee_id, tphoto)
+	VALUES('1','login.png');
 
+		
+CREATE TABLE files(id INT GENERATED ALWAYS AS IDENTITY,
+						name varchar(50),
+						type varchar(50),
+						data bytea,
+						PRIMARY KEY(id));
+								
+INSERT INTO files(name, type, data)
+	VALUES('psg','file','https://th.bing.com/th/id/R.3de505503a610164015b15024a77002c?');
  

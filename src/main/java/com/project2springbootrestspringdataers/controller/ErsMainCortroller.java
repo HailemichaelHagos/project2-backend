@@ -1,5 +1,7 @@
 package com.project2springbootrestspringdataers.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,10 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project2springbootrestspringdataers.exception.SystemException;
 import com.project2springbootrestspringdataers.pojo.EmployeePojo;
+import com.project2springbootrestspringdataers.pojo.ErsProofImagePojo;
 import com.project2springbootrestspringdataers.pojo.ManagerPojo;
 import com.project2springbootrestspringdataers.pojo.PendingReimbursmentPojo;
 import com.project2springbootrestspringdataers.pojo.ResolvedReimbursmentPojo;
 import com.project2springbootrestspringdataers.service.EmployeeService;
+import com.project2springbootrestspringdataers.service.ErsProofImageImageService;
 import com.project2springbootrestspringdataers.service.ManagerService;
 import com.project2springbootrestspringdataers.service.PendingReimbursmentService;
 import com.project2springbootrestspringdataers.service.ResolvedReimbursmentService;
@@ -37,6 +41,10 @@ public class ErsMainCortroller {
 	
 	@Autowired
 	ResolvedReimbursmentService resolvedReimbursmentService;
+	
+	//proofImage
+	@Autowired
+	ErsProofImageImageService ersProofImageImageService;
 	
 	//read or view an employee details
 	//http://localhost:4444/api/employees/1
@@ -132,4 +140,52 @@ public class ErsMainCortroller {
 				return resolvedReimbursmentService.approveOrDeny(resolvedReimbursmentPojo);
 		
 	}
+	
+				/* ========= =============ProofImage==================*/
+	//fetch all ImageProofs
+	// http://localhost:4444/api/images
+	@GetMapping("images")
+	public List<ErsProofImagePojo> fetchAllImageProofs() throws SystemException {
+		List<ErsProofImagePojo> imagePojoList = ersProofImageImageService.fetchAllImageProofs();
+		for(ErsProofImagePojo ersProofImagePojo: imagePojoList) {
+			byte[] b = ersProofImagePojo.getTphoto();
+			byte[] encodedBase64 = Base64.getEncoder().encode(b);
+			
+			
+			try {
+				String base64DataString = new String(encodedBase64, "UTF-8");
+				ersProofImagePojo.setPhoto(base64DataString);
+				
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		return imagePojoList;
+	}
+	
+	// fetch an Image
+	// http://localhost:4444/api/images/1
+	@GetMapping("images/{reimbursementId}")
+	public ErsProofImagePojo fetchProofImage(@PathVariable("reimbursementId") int reimbursementId) {
+		return ersProofImageImageService.fetchProofImage(reimbursementId);
+	}
+	
+	// fetch an Image
+		// http://localhost:4444/api/images/submit
+		@PostMapping("images/submit")
+		public ErsProofImagePojo createProofImage(@RequestBody ErsProofImagePojo ersProofImagePojo) {
+			try {
+				ersProofImageImageService.saveProofImage(ersProofImagePojo);
+			} catch (SystemException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return ersProofImagePojo;
+		}
+		
+	
+	
 }
